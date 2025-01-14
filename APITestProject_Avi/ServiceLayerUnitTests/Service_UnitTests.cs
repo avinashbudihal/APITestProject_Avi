@@ -1,40 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using FluentAssertions;
+using APITestProject_Avi.DTOs;
+using APITestProject_Avi.Utility;
 
 namespace APITestProject_Avi.ServiceLayerUnitTests
 {
     public class Service_UnitTests
     {
-        /// <summary>
-		/// Below test validates deposit method
-		/// </summary>
-		[Test]
-        public async Task Deposit_Test()
+        #region Happy scenarios
+
+        [Test]
+        public async Task DepositTest()
         {
-            var client = new HttpClient();
-            var request = CreateHttpClientRequest(HttpMethod.Post, "deposit", 1000);
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
+            try
+            {
+                const double amountValue = 1000;
+                var content = new StringContent(JsonConvert.SerializeObject(
+                    new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
+                var client = new HttpClient();
+                var response = await client.PostAsync($"{Common.BaseUrl}deposit", content);
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                Amount result = JsonConvert.DeserializeObject<Amount>(await response.Content.ReadAsStringAsync());
+                result.Should().NotBeNull();
+                result.amount.Should().BeGreaterThanOrEqualTo(amountValue);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
         }
 
-        public HttpRequestMessage CreateHttpClientRequest(HttpMethod httpMethodType, string requestMethod, int amount = 0)
+        [Test]
+        public async Task GetBalanceTest()
         {
-            var request = new HttpRequestMessage(httpMethodType, $"{"http://localhost:8080/onlinewallet/"}{requestMethod}");
-            request.Headers.Add("accept", "text/plain");
-            if (httpMethodType == HttpMethod.Post)
-                request.Content = CreateJsonContent(amount);
+            try
+            {
+                var client = new HttpClient();
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{Common.BaseUrl}{"balance"}");
+                request.Headers.Add("accept", "text/plain");
+                var response = await client.SendAsync(request);
 
-            return request;
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                Amount result = JsonConvert.DeserializeObject<Amount>(await response.Content.ReadAsStringAsync());
+                result.Should().NotBeNull();
+                result.amount.Should().BeGreaterThanOrEqualTo(0);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public StringContent CreateJsonContent(int amount)
+        [Test]
+        public async Task WithdrawTest()
         {
-            string jsonString = $"{{\"amount\": {amount}}}";
-            return new StringContent(jsonString, Encoding.UTF8, "application/json");
+            try
+            {
+                const double amountValue = 150;
+                var content = new StringContent(JsonConvert.SerializeObject(
+                    new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
+                var client = new HttpClient();
+                var response = await client.PostAsync($"{Common.BaseUrl}withdraw", content);
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                Amount result = JsonConvert.DeserializeObject<Amount>(await response.Content.ReadAsStringAsync());
+                result.Should().NotBeNull();
+                result.amount.Should().BeGreaterThanOrEqualTo(amountValue);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
+
+        #endregion
     }
 }
