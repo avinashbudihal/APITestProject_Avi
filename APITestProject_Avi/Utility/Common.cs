@@ -10,6 +10,9 @@ namespace APITestProject_Avi.Utility
     {
         private const string _baseUrl = "http://localhost:8080/onlinewallet/";
 
+        /// <summary>
+        /// Peroperty which provides base url
+        /// </summary>
         public static string BaseUrl
         {
             get { return _baseUrl; }

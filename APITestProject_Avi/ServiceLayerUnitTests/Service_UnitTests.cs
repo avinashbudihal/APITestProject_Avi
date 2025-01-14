@@ -9,8 +9,12 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
 {
     public class Service_UnitTests
     {
-        #region Happy scenarios
+        #region Happy Scenarios
 
+        /// <summary>
+        /// This test verify the deposit function
+        /// </summary>
+        /// <returns>Task</returns>
         [Test]
         public async Task DepositTest()
         {
@@ -34,6 +38,10 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
             
         }
 
+        /// <summary>
+        /// This test verify the get balance function
+        /// </summary>
+        /// <returns>Task</returns>
         [Test]
         public async Task GetBalanceTest()
         {
@@ -55,6 +63,10 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
             }
         }
 
+        /// <summary>
+        /// This test verify the withdraw function
+        /// </summary>
+        /// <returns>Task</returns>
         [Test]
         public async Task WithdrawTest()
         {
