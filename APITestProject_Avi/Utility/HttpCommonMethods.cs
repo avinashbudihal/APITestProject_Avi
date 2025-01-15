@@ -6,17 +6,16 @@ namespace APITestProject_Avi.Utility
 {
     public class HttpCommonMethods
     {
+        #region Properties
+
         /// <summary>
         /// base url of the service
         /// </summary>
         private const string _baseUrl = "http://localhost:8080/onlinewallet/";
-        /// <summary>
-        /// Peroperty which provides base url
-        /// </summary>
-        public static string BaseUrl
-        {
-            get { return _baseUrl; }
-        }
+
+        #endregion
+
+        #region E2E ScenariosHTTPMethods
 
         /// <summary>
         /// Get functionality
@@ -61,5 +60,7 @@ namespace APITestProject_Avi.Utility
                 throw ex;
             }
         }
+
+        #endregion
     }
 }
