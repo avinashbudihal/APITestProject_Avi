@@ -10,6 +10,8 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
 {
     public class Service_UnitTests
     {
+
+
         #region Happy Scenarios
 
         /// <summary>
@@ -25,7 +27,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
                 var content = new StringContent(JsonConvert.SerializeObject(
                     new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
                 var client = new HttpClient();
-                var response = await client.PostAsync($"{Common.BaseUrl}deposit", content);
+                var response = await client.PostAsync($"{HttpCommonMethods.BaseUrl}deposit", content);
 
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 Amount result = JsonConvert.DeserializeObject<Amount>(await response.Content.ReadAsStringAsync());
@@ -49,7 +51,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
             try
             {
                 var client = new HttpClient();
-                var request = new HttpRequestMessage(HttpMethod.Get, $"{Common.BaseUrl}{"balance"}");
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{HttpCommonMethods.BaseUrl}{"balance"}");
                 request.Headers.Add("accept", "text/plain");
                 var response = await client.SendAsync(request);
 
@@ -77,7 +79,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
                 var content = new StringContent(JsonConvert.SerializeObject(
                     new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
                 var client = new HttpClient();
-                var response = await client.PostAsync($"{Common.BaseUrl}withdraw", content);
+                var response = await client.PostAsync($"{HttpCommonMethods.BaseUrl}withdraw", content);
 
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 Amount result = JsonConvert.DeserializeObject<Amount>(await response.Content.ReadAsStringAsync());
@@ -108,7 +110,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
                 var content = new StringContent(JsonConvert.SerializeObject(
                     new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
                 var client = new HttpClient();
-                var response = await client.PostAsync($"{Common.BaseUrl}deposit", content);
+                var response = await client.PostAsync($"{HttpCommonMethods.BaseUrl}deposit", content);
 
                 response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
                 ResponseErrorMessage result = JsonConvert.DeserializeObject<ResponseErrorMessage>(await response.Content.ReadAsStringAsync());
@@ -136,7 +138,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
                 var content = new StringContent(JsonConvert.SerializeObject(
                     new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
                 var client = new HttpClient();
-                var response = await client.PostAsync($"{Common.BaseUrl}withdraw", content);
+                var response = await client.PostAsync($"{HttpCommonMethods.BaseUrl}withdraw", content);
 
                 response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
                 ResponseErrorMessage result = JsonConvert.DeserializeObject<ResponseErrorMessage>(await response.Content.ReadAsStringAsync());
@@ -164,7 +166,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
                 var content = new StringContent(JsonConvert.SerializeObject(
                     new Amount { amount = amountValue }), Encoding.UTF8, "application/json");
                 var client = new HttpClient();
-                var response = await client.PostAsync($"{Common.BaseUrl}withdraws", content);
+                var response = await client.PostAsync($"{HttpCommonMethods.BaseUrl}withdraws", content);
 
                 response.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }

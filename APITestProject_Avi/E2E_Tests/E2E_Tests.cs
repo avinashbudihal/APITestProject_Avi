@@ -1,32 +1,66 @@
-﻿using APITestProject_Avi.DTOs;
-using APITestProject_Avi.Utility;
+﻿using System.Net;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using FluentAssertions;
+using APITestProject_Avi.DTOs;
+using APITestProject_Avi.Utility;
 
 namespace APITestProject_Avi.E2E_Tests
 {
     public class E2E_Tests
     {
+        #region Constructor
+
+        /// <summary>
+        /// Constructor of E2E_Tests class
+        /// </summary>
+        public E2E_Tests()
+        {
+            _httpMethod = new HttpCommonMethods();
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// property for HttpCommonMethods
+        /// </summary>
+        public HttpCommonMethods _httpMethod;
+
+        #endregion
+
         #region E2E Scenarios
 
         /// <summary>
         /// This end-to-end test verifies the consecutive deposit and withdrawal actions
         /// </summary>
-        /// <returns>Task</returns>
         [Test]
-        public async Task Verify_DepositAndWithdrawAmounts()
+        public void Verify_DepositAndWithdrawAmounts()
         {
             try
             {
-                // get balance
-                // deposite 600
-                // get balance
-                // withdraw 150
+                // Get initial balance
+                var balanceResponse = _httpMethod.GetMethod("balance");
+                balanceResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                balanceResponse.Content.Should().NotBeNullOrEmpty();
+                double initialBalance = JsonConvert.DeserializeObject<Amount>(balanceResponse.Content).amount;
+
+                // Deposit amount
+                double amountToDeposit = 25.5;
+                var depositResponse = _httpMethod.PostMethod("deposit", new Amount { amount = amountToDeposit });
+                depositResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                depositResponse.Content.Should().NotBeNullOrEmpty();
+                double currentBalance = JsonConvert.DeserializeObject<Amount>(depositResponse.Content).amount;
+                // Amount to deposit can be 0 also, hence greater than or equal check added
+                currentBalance.Should().BeGreaterThanOrEqualTo(initialBalance);
+
+                // Withdraw amount
+                double amountToWithdraw = 20;
+                var withdrawResponse = _httpMethod.PostMethod("withdraw", new Amount { amount = amountToWithdraw });
+                withdrawResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                withdrawResponse.Content.Should().NotBeNullOrEmpty();
+                double newBalance = JsonConvert.DeserializeObject<Amount>(withdrawResponse.Content).amount;
+                newBalance.Should().Be(currentBalance - amountToWithdraw);
             }
             catch (Exception ex)
             {
@@ -38,41 +72,49 @@ namespace APITestProject_Avi.E2E_Tests
         /// <summary>
         /// This end-to-end test verifies the withdraw of amount greater than balance
         /// </summary>
-        /// <returns>Task</returns>
         [Test]
-        public async Task Verify_WithdrawOfAmountGreaterThanBalance()
+        public void Verify_WithdrawOfAmountGreaterThanBalance()
         {
             try
             {
-                // get balance
-                // Try to withdraw amount = balance+10
+                // Get initial balance
+                var balanceResponse = _httpMethod.GetMethod("balance");
+                balanceResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+                balanceResponse.Content.Should().NotBeNullOrEmpty();
+                double initialBalance = JsonConvert.DeserializeObject<Amount>(balanceResponse.Content).amount;
+
+                // Withdraw amount greater than balance
+                double amountToWithdraw = initialBalance + 1;
+                var withdrawResponse = _httpMethod.PostMethod("withdraw", new Amount { amount = amountToWithdraw });
+                withdrawResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                withdrawResponse.Content.Should().NotBeNullOrEmpty();
+                var errorMessage = JsonConvert.DeserializeObject<ResponseErrorMessage>(withdrawResponse.Content);
+                errorMessage.title.Should().Contain("Invalid withdrawal amount. There are insufficient funds.");
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-
         }
 
         /// <summary>
-        /// This end-to-end test verifies the withdraw of amount greater than balance
+        /// This end-to-end test verifies multiple times deposit and withdraw operations
         /// </summary>
-        /// <returns>Task</returns>
         [Test]
-        public async Task Verify_TryToWithdrawAmountWhenBalanceIsZero()
+        public void Verify_DepositAndWithdrawMultipleTimes()
         {
             try
             {
-                // get balance
-                // Withdraw amount = balance
-                // get balance
-                // Try to withdraw 60
+                // First round of deposit and withdraw
+                Verify_DepositAndWithdrawAmounts();
+
+                // Second round of deposit and withdraw
+                Verify_DepositAndWithdrawAmounts();
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-
         }
 
         #endregion
