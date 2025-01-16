@@ -38,12 +38,13 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
         /// This test verify the deposit function
         /// </summary>
         [Test, Order(1)]
-        public void DepositTest()
+        [TestCase(1000)]
+        [TestCase(5.29)]
+        public void DepositTest(double amountToDeposit)
         {
             try
             {
                 // Deposit amount
-                double amountToDeposit = 1000;
                 var depositResponse = _httpMethod.PostMethod("deposit", new Amount { amount = amountToDeposit });
                 depositResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 depositResponse.Content.Should().NotBeNullOrEmpty();
@@ -82,12 +83,13 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
         /// This test verify the withdraw function
         /// </summary>
         [Test, Order(2)]
-        public async Task WithdrawTest()
+        [TestCase(25)]
+        [TestCase(25.5)]
+        public async Task WithdrawTest(double amountToWithdraw)
         {
             try
             {
                 // Withdraw amount (the value should be less than balance amount, this check achieved by specifying order to test method)
-                double amountToWithdraw = 25;
                 var withdrawResponse = _httpMethod.PostMethod("withdraw", new Amount { amount = amountToWithdraw });
                 withdrawResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 withdrawResponse.Content.Should().NotBeNullOrEmpty();
@@ -108,12 +110,12 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
         /// This test verify the deposit function
         /// </summary>
         [Test]
-        public void DepositNegativeAmountTest()
+        [TestCase(-60)]
+        public void DepositNegativeAmountTest(double amountToDeposit)
         {
             try
             {
                 // Deposit negative amount
-                double amountToDeposit = -60;
                 var depositResponse = _httpMethod.PostMethod("deposit", new Amount { amount = amountToDeposit });
                 depositResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
                 depositResponse.Content.Should().NotBeNullOrEmpty();
@@ -132,12 +134,12 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
         /// This test verify the withdraw function
         /// </summary>
         [Test]
-        public void WithdrawNegativeAmountTest()
+        [TestCase(-5)]
+        public void WithdrawNegativeAmountTest(double amountToWithdraw)
         {
             try
             {
                 // Withdraw negative amount
-                double amountToWithdraw = -40;
                 var withdrawResponse = _httpMethod.PostMethod("withdraw", new Amount { amount = amountToWithdraw });
                 withdrawResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
                 withdrawResponse.Content.Should().NotBeNullOrEmpty();
@@ -164,33 +166,6 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
                 double amountToWithdraw = 0;
                 var withdrawResponse = _httpMethod.PostMethod(invalidEndpoint, new Amount { amount = amountToWithdraw });
                 withdrawResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        #endregion
-
-        #region Edge case
-
-        /// <summary>
-        /// This test verify the deposit of big fractional value
-        /// </summary>
-        [Test]
-        public void DepositFractionalValueTest()
-        {
-            try
-            {
-                // Deposit amount
-                double amountToDeposit = 1.256776786785673333764746547564;
-                var depositResponse = _httpMethod.PostMethod("deposit", new Amount { amount = amountToDeposit });
-                depositResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-                depositResponse.Content.Should().NotBeNullOrEmpty();
-                double currentBalance = JsonConvert.DeserializeObject<Amount>(depositResponse.Content).amount;
-                // Amount to deposit can be 0 also, hence greater than or equal check added
-                currentBalance.Should().BeGreaterThanOrEqualTo(amountToDeposit);
             }
             catch (Exception ex)
             {

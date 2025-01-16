@@ -36,7 +36,8 @@ namespace APITestProject_Avi.E2E_Tests
         /// This end-to-end test verifies the consecutive deposit and withdrawal actions
         /// </summary>
         [Test]
-        public void Verify_DepositAndWithdrawAmounts()
+        [TestCase(600,5)]
+        public void Verify_DepositAndWithdrawAmounts(double amountToDeposit, double amountToWithdraw)
         {
             try
             {
@@ -47,7 +48,6 @@ namespace APITestProject_Avi.E2E_Tests
                 double initialBalance = JsonConvert.DeserializeObject<Amount>(balanceResponse.Content).amount;
 
                 // Deposit amount
-                double amountToDeposit = 25.5;
                 var depositResponse = _httpMethod.PostMethod("deposit", new Amount { amount = amountToDeposit });
                 depositResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 depositResponse.Content.Should().NotBeNullOrEmpty();
@@ -56,7 +56,6 @@ namespace APITestProject_Avi.E2E_Tests
                 currentBalance.Should().BeGreaterThanOrEqualTo(initialBalance);
 
                 // Withdraw amount
-                double amountToWithdraw = 20;
                 var withdrawResponse = _httpMethod.PostMethod("withdraw", new Amount { amount = amountToWithdraw });
                 withdrawResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 withdrawResponse.Content.Should().NotBeNullOrEmpty();
@@ -102,15 +101,16 @@ namespace APITestProject_Avi.E2E_Tests
         /// This end-to-end test verifies multiple times deposit and withdraw operations
         /// </summary>
         [Test]
-        public void Verify_DepositAndWithdrawMultipleTimes()
+        [TestCase(900, 3)]
+        public void Verify_DepositAndWithdrawMultipleTimes(double amountToDeposit, double amountToWithdraw)
         {
             try
             {
                 // First round of deposit and withdraw
-                Verify_DepositAndWithdrawAmounts();
+                Verify_DepositAndWithdrawAmounts(amountToDeposit, amountToWithdraw);
 
                 // Second round of deposit and withdraw
-                Verify_DepositAndWithdrawAmounts();
+                Verify_DepositAndWithdrawAmounts(amountToDeposit, amountToWithdraw);
             }
             catch (Exception ex)
             {
