@@ -6,6 +6,7 @@ using APITestProject_Avi.Utility;
 
 namespace APITestProject_Avi.E2E_Tests
 {
+    [TestFixture]
     public class E2E_Tests
     {
         #region Constructor

@@ -1,14 +1,14 @@
 ﻿using System.Net;
-using System.Text;
 using Newtonsoft.Json;
 using FluentAssertions;
 using NUnit.Framework.Internal;
 using APITestProject_Avi.DTOs;
 using APITestProject_Avi.Utility;
-using System.Net.Http;
 
 namespace APITestProject_Avi.ServiceLayerUnitTests
 {
+    [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class Service_UnitTests
     {
         #region Constructor
@@ -37,7 +37,7 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
         /// <summary>
         /// This test verify the deposit function
         /// </summary>
-        [Test]
+        [Test, Order(1)]
         public void DepositTest()
         {
             try
@@ -81,13 +81,13 @@ namespace APITestProject_Avi.ServiceLayerUnitTests
         /// <summary>
         /// This test verify the withdraw function
         /// </summary>
-        [Test]
+        [Test, Order(2)]
         public async Task WithdrawTest()
         {
             try
             {
-                // Withdraw amount (0 if no balance)
-                double amountToWithdraw = 0;
+                // Withdraw amount (the value should be less than balance amount, this check achieved by specifying order to test method)
+                double amountToWithdraw = 25;
                 var withdrawResponse = _httpMethod.PostMethod("withdraw", new Amount { amount = amountToWithdraw });
                 withdrawResponse.StatusCode.Should().Be(HttpStatusCode.OK);
                 withdrawResponse.Content.Should().NotBeNullOrEmpty();
